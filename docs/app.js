@@ -6,17 +6,22 @@ const API_URL = "https://impostor-2-u22d.onrender.com";
 
 const pantallaInicio = document.getElementById("pantallaInicio");
 const pantallaLobby = document.getElementById("pantallaLobby");
+const pantallaCarta = document.getElementById("pantallaCarta");
+
+const inputNombre = document.getElementById("inputNombre");
+const inputCodigo = document.getElementById("inputCodigo");
 
 const btnCrearSala = document.getElementById("btnCrearSala");
 const btnUnirse = document.getElementById("btnUnirse");
 const btnEmpezar = document.getElementById("btnEmpezar");
 
-const inputNombre = document.getElementById("inputNombre");
-const inputCodigo = document.getElementById("inputCodigo");
-
 const textoCodigo = document.getElementById("textoCodigo");
 const codigoLobby = document.getElementById("codigoLobby");
 const listaJugadores = document.getElementById("listaJugadores");
+const selectCategoria = document.getElementById("selectCategoria");
+
+const card = document.getElementById("card");
+const textoCarta = document.getElementById("textoCarta");
 
 // =====================
 // ESTADO
@@ -24,6 +29,7 @@ const listaJugadores = document.getElementById("listaJugadores");
 
 let codigoSala = null;
 let nombreJugador = null;
+let cartaMostrada = false;
 
 // =====================
 // CREAR SALA
@@ -92,9 +98,9 @@ async function actualizarLobby() {
   const sala = await res.json();
 
   listaJugadores.innerHTML = "";
-  sala.jugadores.forEach(j => {
+  sala.jugadores.forEach(jugador => {
     const li = document.createElement("li");
-    li.textContent = j;
+    li.textContent = jugador;
     listaJugadores.appendChild(li);
   });
 }
@@ -103,6 +109,44 @@ async function actualizarLobby() {
 // EMPEZAR PARTIDA
 // =====================
 
-btnEmpezar.addEventListener("click", () => {
-  alert("Acá arranca la lógica del juego (siguiente paso)");
+btnEmpezar.addEventListener("click", async () => {
+  const categoria = selectCategoria.value;
+
+  await fetch(`${API_URL}/empezar`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      codigo: codigoSala,
+      categoria
+    })
+  });
+
+  pantallaLobby.style.display = "none";
+  pantallaCarta.style.display = "block";
+});
+
+// =====================
+// CARTA
+// =====================
+
+card.addEventListener("click", async () => {
+  if (!cartaMostrada) {
+    const res = await fetch(`${API_URL}/ver-carta`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        codigo: codigoSala,
+        nombre: nombreJugador
+      })
+    });
+
+    const data = await res.json();
+    card.textContent = data.rol;
+    textoCarta.textContent = "Volvé a tocar para ocultar";
+    cartaMostrada = true;
+  } else {
+    card.textContent = "🂠";
+    textoCarta.textContent = "Pasá el celu al siguiente";
+    cartaMostrada = false;
+  }
 });
