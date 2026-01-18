@@ -89,6 +89,16 @@ function mostrarJugadores(jugadores) {
   });
 }
 
+document.getElementById("btnEmpezar").addEventListener("click", async () => {
+  await fetch("https://impostor-2-u22d.onrender.com/empezar", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ codigo })
+  });
+
+  alert("Partida iniciada");
+});
+
 // =====================
 // EVENTOS
 // =====================

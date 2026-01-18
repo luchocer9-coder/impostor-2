@@ -3,24 +3,70 @@
 <head>
   <meta charset="UTF-8">
   <title>Impostor Online</title>
-  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <h1>🕵️ Impostor</h1>
+<h1>Impostor</h1>
 
-  <button id="crearSalaBtn">Crear sala</button>
-<p>Código: <span id="codigoSala">----</span></p>
+<input id="nombre" placeholder="Tu nombre" />
+<input id="codigo" placeholder="Código sala" />
 
-<hr>
+<br><br>
 
-<input id="inputCodigo" placeholder="Código de sala">
-<input id="inputNombre" placeholder="Tu nombre">
-<button id="unirseSalaBtn">Unirse</button>
+<button onclick="crearSala()">Crear sala</button>
+<button onclick="unirseSala()">Unirse</button>
+<button onclick="empezar()">Empezar partida</button>
+<button onclick="verRol()">Ver mi rol</button>
 
-<ul id="listaJugadores"></ul>
+<script>
+const API = "https://impostor-2-u22d.onrender.com";
 
-<script src="app.js"></script>
+async function crearSala() {
+  const res = await fetch(API + "/crear", { method: "POST" });
+  const data = await res.json();
+  document.getElementById("codigo").value = data.codigo;
+  alert("Sala creada: " + data.codigo);
+}
+
+async function unirseSala() {
+  const nombre = document.getElementById("nombre").value;
+  const codigo = document.getElementById("codigo").value;
+
+  await fetch(API + "/unirse", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ nombre, codigo })
+  });
+
+  alert("Unido a la sala");
+}
+
+async function empezar() {
+  const codigo = document.getElementById("codigo").value;
+
+  await fetch(API + "/empezar", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ codigo })
+  });
+
+  alert("Partida iniciada");
+}
+
+async function verRol() {
+  const nombre = document.getElementById("nombre").value;
+  const codigo = document.getElementById("codigo").value;
+
+  const res = await fetch(API + "/mi-rol", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ nombre, codigo })
+  });
+
+  const data = await res.json();
+  alert("Tu rol es: " + data.rol);
+}
+</script>
 
 </body>
 </html>

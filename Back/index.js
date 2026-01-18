@@ -7,39 +7,27 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// =====================
-// MEMORIA DEL SERVIDOR
-// =====================
+// ==================
+// DATA EN MEMORIA
+// ==================
 const salas = {};
 
-// =====================
-// UTILIDADES
-// =====================
-function generarCodigoSala() {
-  const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  let codigo = "";
-  for (let i = 0; i < 4; i++) {
-    codigo += letras[Math.floor(Math.random() * letras.length)];
-  }
-  return codigo;
-}
-
-// =====================
-// RUTAS
-// =====================
-
-// (opcional, solo para que no diga Cannot GET /)
+// ==================
+// RUTA TEST
+// ==================
 app.get("/", (req, res) => {
-  res.send("Servidor Impostor OK");
+  res.send("Servidor Impostor OK 🚀");
 });
 
-// Crear sala
-app.post("/crear-sala", (req, res) => {
-  const codigo = generarCodigoSala();
+// ==================
+// CREAR SALA
+// ==================
+app.post("/crear", (req, res) => {
+  const codigo = Math.random().toString(36).substring(2, 6).toUpperCase();
 
   salas[codigo] = {
-    codigo,
     jugadores: [],
+    roles: {},
     estado: "esperando"
   };
 
@@ -47,14 +35,11 @@ app.post("/crear-sala", (req, res) => {
   res.json({ codigo });
 });
 
-// Unirse a sala
+// ==================
+// UNIRSE A SALA
+// ==================
 app.post("/unirse", (req, res) => {
   const { codigo, nombre } = req.body;
-
-  if (!codigo || !nombre) {
-    return res.status(400).json({ error: "Faltan datos" });
-  }
-
   const sala = salas[codigo];
 
   if (!sala) {
@@ -71,15 +56,58 @@ app.post("/unirse", (req, res) => {
   res.json({ ok: true, jugadores: sala.jugadores });
 });
 
-// Info sala (debug)
-app.get("/sala/:codigo", (req, res) => {
-  const sala = salas[req.params.codigo];
-  if (!sala) return res.status(404).json({ error: "No existe" });
-  res.json(sala);
+// ==================
+// EMPEZAR PARTIDA
+// ==================
+app.post("/empezar", (req, res) => {
+  const { codigo } = req.body;
+  const sala = salas[codigo];
+
+  if (!sala) {
+    return res.status(404).json({ error: "Sala no existe" });
+  }
+
+  if (sala.jugadores.length < 3) {
+    return res.status(400).json({ error: "Mínimo 3 jugadores" });
+  }
+
+  const indice = Math.floor(Math.random() * sala.jugadores.length);
+  const impostor = sala.jugadores[indice];
+
+  sala.roles = {};
+
+  sala.jugadores.forEach(jugador => {
+    sala.roles[jugador] =
+      jugador === impostor ? "impostor" : "tripulante";
+  });
+
+  sala.estado = "jugando";
+
+  console.log("Roles asignados:", sala.roles);
+  res.json({ ok: true });
 });
 
-// =====================
+// ==================
+// VER MI ROL (PRIVADO)
+// ==================
+app.post("/mi-rol", (req, res) => {
+  const { codigo, nombre } = req.body;
+  const sala = salas[codigo];
 
+  if (!sala || sala.estado !== "jugando") {
+    return res.status(400).json({ error: "Partida no iniciada" });
+  }
+
+  const rol = sala.roles[nombre];
+
+  if (!rol) {
+    return res.status(404).json({ error: "Jugador no encontrado" });
+  }
+
+  res.json({ rol });
+});
+
+// ==================
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en puerto ${PORT}`);
 });
