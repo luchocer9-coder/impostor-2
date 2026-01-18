@@ -9,29 +9,18 @@
 
   <h1>🕵️ Impostor</h1>
 
-  <div id="crear">
-    <button id="btnCrear">Crear sala</button>
-    <p id="codigoSala"></p>
-  </div>
-  
+  <button id="crearSalaBtn">Crear sala</button>
+<p>Código: <span id="codigoSala">----</span></p>
 
-  <div id="unirse">
-    <input type="text" id="codigo" placeholder="Código de sala">
-    <input type="text" id="nombre" placeholder="Tu nombre">
-    <button id="btnUnirse">Unirse</button>
-  </div>
+<hr>
 
-  <pre id="resultado"></pre>
+<input id="inputCodigo" placeholder="Código de sala">
+<input id="inputNombre" placeholder="Tu nombre">
+<button id="unirseSalaBtn">Unirse</button>
 
-  <h2>Jugadores en la sala</h2>
 <ul id="listaJugadores"></ul>
 
-<button id="btnEmpezar">Empezar partida</button>
-<button id="btnRol">Ver mi rol</button>
+<script src="app.js"></script>
 
-<h2 id="rol"></h2>
-
-
-  <script src="app.js"></script>
 </body>
 </html>

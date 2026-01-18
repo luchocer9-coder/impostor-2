@@ -1,63 +1,56 @@
-// ============================
-// ELEMENTOS DEL DOM
-// ============================
+// =====================
+// CONFIG
+// =====================
+const API_URL = "https://impostor-2-u22d.onrender.com";
 
-const btnCrear = document.getElementById("btnCrear");
-const btnUnirse = document.getElementById("btnUnirse");
+// =====================
+// ELEMENTOS
+// =====================
+const crearBtn = document.getElementById("crearSalaBtn");
+const unirseBtn = document.getElementById("unirseSalaBtn");
 
-const codigoInput = document.getElementById("codigo");
-const nombreInput = document.getElementById("nombre");
+const codigoSalaSpan = document.getElementById("codigoSala");
+const inputCodigo = document.getElementById("inputCodigo");
+const inputNombre = document.getElementById("inputNombre");
 
-const codigoSala = document.getElementById("codigoSala");
-const resultado = document.getElementById("resultado");
-const listaJugadores = document.getElementById("listaJugadores");
+const jugadoresUl = document.getElementById("listaJugadores");
 
-// ============================
-// ESTADO
-// ============================
-
-let codigoActual = null;
-
-// ============================
+// =====================
 // CREAR SALA
-// ============================
-
-btnCrear.addEventListener("click", async () => {
+// =====================
+async function crearSala() {
   try {
-    const res = await fetch("http://localhost:3000/crear-sala", {
-      method: "POST"
+    const res = await fetch(`${API_URL}/crear-sala`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      }
     });
 
     const data = await res.json();
+    codigoSalaSpan.textContent = data.codigo;
 
-    codigoActual = data.codigo;
-
-    codigoSala.textContent = "Código de sala: " + data.codigo;
-    codigoInput.value = data.codigo;
-    resultado.textContent = "Sala creada";
-
-  } catch (err) {
-    alert("Error creando sala");
+    console.log("Sala creada:", data.codigo);
+  } catch (error) {
+    alert("Error al crear sala");
+    console.error(error);
   }
-});
+}
 
-// ============================
+// =====================
 // UNIRSE A SALA
-// ============================
-
-btnUnirse.addEventListener("click", async () => {
-  const codigo = codigoInput.value;
-  const nombre = nombreInput.value;
+// =====================
+async function unirseSala() {
+  const codigo = inputCodigo.value.toUpperCase();
+  const nombre = inputNombre.value.trim();
 
   if (!codigo || !nombre) {
-    alert("Completá código y nombre");
+    alert("Faltan datos");
     return;
   }
 
-  codigoActual = codigo;
-
   try {
-    const res = await fetch("http://localhost:3000/unirse", {
+    const res = await fetch(`${API_URL}/unirse`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -71,104 +64,33 @@ btnUnirse.addEventListener("click", async () => {
     const data = await res.json();
 
     if (!res.ok) {
-      resultado.textContent = data.error;
-      return;
-    }
-
-    resultado.textContent = "Te uniste a la sala";
-
-  } catch (err) {
-    resultado.textContent = "Error conectando con el servidor";
-  }
-});
-
-// ============================
-// ACTUALIZAR JUGADORES
-// ============================
-
-async function actualizarJugadores() {
-  if (!codigoActual) return;
-
-  try {
-    const res = await fetch(`http://localhost:3000/sala/${codigoActual}`);
-    const data = await res.json();
-
-    listaJugadores.innerHTML = "";
-
-    data.jugadores.forEach(jugador => {
-      const li = document.createElement("li");
-      li.textContent = jugador;
-      listaJugadores.appendChild(li);
-    });
-
-  } catch (err) {
-    console.log("Error actualizando jugadores");
-  }
-}
-
-const btnEmpezar = document.getElementById("btnEmpezar");
-const btnRol = document.getElementById("btnRol");
-const rolTexto = document.getElementById("rol");
-
-// Empezar partida
-btnEmpezar.addEventListener("click", async () => {
-  if (!codigoActual) return;
-
-  try {
-    const res = await fetch("http://localhost:3000/empezar", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ codigo: codigoActual })
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
       alert(data.error);
       return;
     }
 
-    alert("Partida iniciada");
-
-  } catch {
-    alert("Error al empezar");
+    mostrarJugadores(data.jugadores);
+    console.log("Unido a sala", codigo);
+  } catch (error) {
+    alert("Error al unirse");
+    console.error(error);
   }
-});
+}
 
-// Ver mi rol
-btnRol.addEventListener("click", async () => {
-  const nombre = nombreInput.value;
+// =====================
+// MOSTRAR JUGADORES
+// =====================
+function mostrarJugadores(jugadores) {
+  jugadoresUl.innerHTML = "";
 
-  try {
-    const res = await fetch("http://localhost:3000/mi-rol", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        codigo: codigoActual,
-        nombre
-      })
-    });
+  jugadores.forEach(jugador => {
+    const li = document.createElement("li");
+    li.textContent = jugador;
+    jugadoresUl.appendChild(li);
+  });
+}
 
-    const data = await res.json();
-
-    if (!res.ok) {
-      rolTexto.textContent = data.error;
-      return;
-    }
-
-    rolTexto.textContent =
-      data.rol === "IMPOSTOR"
-        ? "🕵️ SOS EL IMPOSTOR"
-        : "✅ Palabra: " + data.rol;
-
-  } catch {
-    rolTexto.textContent = "Error obteniendo rol";
-  }
-});
-
-
-// ============================
-// POLLING CADA 2 SEGUNDOS
-// ============================
-
-setInterval(actualizarJugadores, 2000);
+// =====================
+// EVENTOS
+// =====================
+crearBtn.addEventListener("click", crearSala);
+unirseBtn.addEventListener("click", unirseSala);
