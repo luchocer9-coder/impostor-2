@@ -1,66 +1,35 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Impostor Online</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Impostor</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<h1>IMPOSTOR ONLINE</h1>
+<h1>🕵️ Impostor</h1>
 
-<!-- =====================
-     PANTALLA INICIO
-===================== -->
-<div id="pantallaInicio">
-  <input
-    id="inputNombre"
-    type="text"
-    placeholder="Tu nombre"
-  />
-  <br /><br />
-
-  <button id="btnCrearSala">Crear sala</button>
-
-  <br /><br />
-
-  <input
-    id="inputCodigo"
-    type="text"
-    placeholder="Código de sala"
-  />
-  <button id="btnUnirse">Unirse</button>
-
-  <p id="textoCodigo"></p>
+<div id="crear">
+  <button onclick="crearSala()">Crear sala</button>
+  <p id="codigoSala"></p>
 </div>
 
-<!-- =====================
-     PANTALLA LOBBY
-===================== -->
-<div id="pantallaLobby" style="display:none;">
-  <h2>Sala <span id="codigoLobby"></span></h2>
+<div id="unirse">
+  <input id="codigoInput" placeholder="Código sala" />
+  <input id="nombreInput" placeholder="Tu nombre" />
+  <button onclick="unirseSala()">Unirse</button>
+</div>
 
+<div id="sala" style="display:none">
+  <h3>Jugadores</h3>
   <ul id="listaJugadores"></ul>
-
-  <select id="selectCategoria">
-    <option value="futbol">⚽ Fútbol</option>
-    <option value="peliculas">🎬 Películas</option>
-  </select>
-
-  <br /><br />
-  <button id="btnEmpezar">Empezar partida</button>
+  <button onclick="empezar()">Empezar partida</button>
 </div>
 
-<!-- =====================
-     PANTALLA CARTA
-===================== -->
-<div id="pantallaCarta" style="display:none;">
-  <p id="textoCarta">Tocá para ver tu carta</p>
-  <div id="card">🂠</div>
+<div id="carta" class="card" onclick="verCarta()" style="display:none">
+  TOCAR PARA VER CARTA
 </div>
 
 <script src="app.js"></script>
 </body>
 </html>
-
